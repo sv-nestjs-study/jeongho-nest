@@ -1,0 +1,13 @@
+{
+  "name": "jeongho-nest",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@jeongho-nest/api",
+    "start:dev": "npm run start:dev --workspace=@jeongho-nest/api",
+    "lint": "npm run lint --workspace=@jeongho-nest/api"
+  }
+}
