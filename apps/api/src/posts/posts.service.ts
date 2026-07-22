@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -33,6 +37,13 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
+    if (
+      updatePostDto.title === undefined &&
+      updatePostDto.content === undefined
+    ) {
+      throw new BadRequestException('At least one field must be provided');
+    }
+
     const post = await this.findOne(id);
 
     Object.assign(post, updatePostDto);
