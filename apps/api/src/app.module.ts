@@ -15,9 +15,9 @@ import { PostsModule } from './posts/posts.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      // 기능 모듈에 등록한 Entity를 DB 연결에 자동으로 포함합니다.
+      // forFeature에 등록한 Entity를 DB 연결에도 자동으로 포함합니다.
       autoLoadEntities: true,
-      // 개발 중 Entity 변경에 맞춰 테이블을 자동으로 생성하거나 변경합니다.
+      // 개발 중 Entity 구조에 맞춰 테이블을 자동으로 생성하거나 변경합니다.
       synchronize: true,
     }),
     PostsModule,
