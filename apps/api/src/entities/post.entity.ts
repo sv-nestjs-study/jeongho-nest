@@ -5,17 +5,17 @@ import { BaseTimestampEntity } from './base-timestamp.entity';
 @Entity('posts')
 export class Post extends BaseTimestampEntity {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column()
-  title!: string;
+  title: string;
 
   @Column()
-  content!: string;
+  content: string;
 
   @Column({ length: 30, default: '익명' })
-  authorName!: string;
+  authorName: string;
 
   @Column({ type: 'integer', default: 0 })
-  viewCount!: number;
+  viewCount: number;
 }
