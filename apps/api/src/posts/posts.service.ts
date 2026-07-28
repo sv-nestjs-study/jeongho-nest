@@ -30,12 +30,12 @@ export class PostsService {
   }
 
   async findOne(id: number): Promise<Post> {
-    const post = await this.postsRepository.findOneBy({ id });
+    const post = await this.findPostById(id);
 
-    if (!post) {
-      // 존재하지 않는 id는 404 오류를 반환합니다.
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
-    }
+    // DB의 viewCount 컬럼을 1 증가시킵니다.
+    await this.postsRepository.increment({ id }, 'viewCount', 1);
+    // increment는 수정된 Entity를 반환하지 않으므로 응답 객체의 값도 맞춥니다.
+    post.viewCount += 1;
 
     return post;
   }
@@ -57,7 +57,7 @@ export class PostsService {
     }
 
     // update는 수정 결과 Entity를 반환하지 않으므로 다시 조회합니다.
-    return this.findOne(id);
+    return this.findPostById(id);
   }
 
   async remove(id: number): Promise<void> {
@@ -67,5 +67,16 @@ export class PostsService {
     if (result.affected === 0) {
       throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
     }
+  }
+
+  private async findPostById(id: number): Promise<Post> {
+    const post = await this.postsRepository.findOneBy({ id });
+
+    if (!post) {
+      // 존재하지 않는 id는 404 오류를 반환합니다.
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
+    }
+
+    return post;
   }
 }
