@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,17 +8,26 @@ import { PostsModule } from './posts/posts.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      // forFeature에 등록한 Entity를 DB 연결에도 자동으로 포함합니다.
-      autoLoadEntities: true,
-      // 개발 중 Entity 구조에 맞춰 테이블을 자동으로 생성하거나 변경합니다.
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres' as const,
+        host: configService.getOrThrow<string>('DB_HOST'),
+        port: Number(configService.getOrThrow<string>('DB_PORT')),
+        username: configService.getOrThrow<string>('DB_USERNAME'),
+        password: configService.getOrThrow<string>('DB_PASSWORD'),
+        database: configService.getOrThrow<string>('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize:
+          configService.getOrThrow<string>('DB_SYNCHRONIZE') === 'true',
+        logging: configService.getOrThrow<string>('DB_LOGGING') === 'true',
+        retryAttempts: 5,
+        retryDelay: 3000,
+        invalidWhereValuesBehavior: {
+          null: 'throw',
+          undefined: 'throw',
+        },
+      }),
     }),
     PostsModule,
   ],
