@@ -59,8 +59,8 @@ export class PostsService {
   }
 
   async remove(id: number): Promise<void> {
-    // delete는 id 조건으로 DB 행을 바로 삭제합니다.
-    const result = await this.postsRepository.delete(id);
+    // deletedAt에 삭제 시각을 기록하는 소프트 삭제를 수행합니다.
+    const result = await this.postsRepository.softDelete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException(`Post with id ${id} was not found`);
