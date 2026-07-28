@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -41,14 +37,6 @@ export class PostsService {
   }
 
   async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
-    if (
-      updatePostDto.title === undefined &&
-      updatePostDto.content === undefined
-    ) {
-      // 선택 필드만 있는 수정 DTO에서 빈 객체 요청을 400으로 처리합니다.
-      throw new BadRequestException('수정할 제목 또는 내용을 입력해주세요.');
-    }
-
     // update는 전달된 필드만 DB에 바로 수정합니다.
     const result = await this.postsRepository.update(id, updatePostDto);
 
