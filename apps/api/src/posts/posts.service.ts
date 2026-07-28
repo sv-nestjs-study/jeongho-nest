@@ -24,7 +24,9 @@ export class PostsService {
   }
 
   findAll(): Promise<Post[]> {
-    return this.postsRepository.find();
+    return this.postsRepository.find({
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: number): Promise<Post> {
@@ -32,7 +34,7 @@ export class PostsService {
 
     if (!post) {
       // 존재하지 않는 id는 404 오류를 반환합니다.
-      throw new NotFoundException(`Post with id ${id} was not found`);
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
     }
 
     return post;
@@ -44,14 +46,14 @@ export class PostsService {
       updatePostDto.content === undefined
     ) {
       // 선택 필드만 있는 수정 DTO에서 빈 객체 요청을 400으로 처리합니다.
-      throw new BadRequestException('At least one field must be provided');
+      throw new BadRequestException('수정할 제목 또는 내용을 입력해주세요.');
     }
 
     // update는 전달된 필드만 DB에 바로 수정합니다.
     const result = await this.postsRepository.update(id, updatePostDto);
 
     if (result.affected === 0) {
-      throw new NotFoundException(`Post with id ${id} was not found`);
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
     }
 
     // update는 수정 결과 Entity를 반환하지 않으므로 다시 조회합니다.
@@ -63,7 +65,7 @@ export class PostsService {
     const result = await this.postsRepository.softDelete(id);
 
     if (result.affected === 0) {
-      throw new NotFoundException(`Post with id ${id} was not found`);
+      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
     }
   }
 }

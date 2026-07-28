@@ -12,4 +12,10 @@ export class Post extends BaseTimestampEntity {
 
   @Column()
   content!: string;
+
+  @Column({ length: 30, default: '익명' })
+  authorName!: string;
+
+  @Column({ type: 'integer', default: 0 })
+  viewCount!: number;
 }
