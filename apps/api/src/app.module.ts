@@ -6,9 +6,18 @@ import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 
+const nodeEnvironment = process.env.NODE_ENV ?? 'development';
+const envFilePath =
+  nodeEnvironment === 'production'
+    ? '.env.production'
+    : [`.env.${nodeEnvironment}`, '.env'];
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath,
+    }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
