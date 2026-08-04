@@ -21,7 +21,7 @@ async function bootstrap() {
     .setTitle('Board API')
     .setDescription('Nest CRUD 학습용 게시판 API')
     .setVersion('1.0')
-    .addTag('posts', '게시글 API')
+    .addTag('게시글', '게시글 API')
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);
