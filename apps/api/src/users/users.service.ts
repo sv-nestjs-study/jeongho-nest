@@ -24,6 +24,15 @@ export class UsersService {
       .getOne();
   }
 
+  findByIdWithRefreshTokenHash(id: number): Promise<User | null> {
+    // 기본 조회에서 숨긴 Refresh Token 해시를 재발급 때만 조회합니다.
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect('user.refreshTokenHash')
+      .where('user.id = :id', { id })
+      .getOne();
+  }
+
   create(email: string, nickname: string, passwordHash: string): Promise<User> {
     const user = this.usersRepository.create({
       email,
@@ -32,5 +41,12 @@ export class UsersService {
     });
 
     return this.usersRepository.save(user);
+  }
+
+  async updateRefreshTokenHash(
+    id: number,
+    refreshTokenHash: string,
+  ): Promise<void> {
+    await this.usersRepository.update(id, { refreshTokenHash });
   }
 }

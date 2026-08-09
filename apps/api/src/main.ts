@@ -24,6 +24,15 @@ async function bootstrap() {
     .setDescription('Nest CRUD 학습용 게시판 API')
     .setVersion('1.0')
     .addTag('게시글', '게시글 API')
+    .addTag('인증', '회원가입, 로그인, JWT 인증 API')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

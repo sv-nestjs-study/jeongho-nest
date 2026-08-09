@@ -17,4 +17,9 @@ export class User extends BaseTimestampEntity {
   @Exclude()
   @Column({ select: false })
   passwordHash: string;
+
+  // 응답 JSON과 기본 DB 조회에서 Refresh Token 해시를 제외합니다.
+  @Exclude()
+  @Column({ type: 'varchar', select: false, nullable: true })
+  refreshTokenHash: string | null;
 }
