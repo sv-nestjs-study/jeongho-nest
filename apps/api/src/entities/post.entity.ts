@@ -22,4 +22,6 @@ export class Post extends BaseTimestampEntity {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  commentCount: number;
 }
