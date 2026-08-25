@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseTimestampEntity } from './base-timestamp.entity';
+import { Comment } from './comment.entity';
 
 @Entity('users')
 export class User extends BaseTimestampEntity {
@@ -22,4 +23,7 @@ export class User extends BaseTimestampEntity {
   @Exclude()
   @Column({ type: 'varchar', select: false, nullable: true })
   refreshTokenHash: string | null;
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 }
