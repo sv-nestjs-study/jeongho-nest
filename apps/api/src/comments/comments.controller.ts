@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -13,6 +16,8 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
@@ -70,5 +75,35 @@ export class CommentsController {
   @ApiNotFoundResponse({ description: '게시글을 찾을 수 없습니다.' })
   findAll(@Param('postId', ParseIntPipe) postId: number): Promise<Comment[]> {
     return this.commentsService.findAll(postId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @Delete(':commentId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiParam({
+    name: 'postId',
+    type: Number,
+    description: '게시글 ID',
+    example: 1,
+  })
+  @ApiParam({
+    name: 'commentId',
+    type: Number,
+    description: '댓글 ID',
+    example: 1,
+  })
+  @ApiNoContentResponse({ description: '댓글 삭제 성공' })
+  @ApiBadRequestResponse({
+    description: '게시글 ID 또는 댓글 ID가 올바르지 않습니다.',
+  })
+  @ApiForbiddenResponse({ description: '댓글을 삭제할 권한이 없습니다.' })
+  @ApiNotFoundResponse({ description: '게시글 또는 댓글을 찾을 수 없습니다.' })
+  remove(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Request() request: { user: JwtPayload },
+  ): Promise<void> {
+    return this.commentsService.remove(postId, commentId, request.user.sub);
   }
 }
