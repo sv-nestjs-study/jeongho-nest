@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 
 const nodeEnvironment = process.env.NODE_ENV ?? 'development';
 const envFilePath =
@@ -43,6 +44,7 @@ const envFilePath =
     PostsModule,
     UsersModule,
     AuthModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

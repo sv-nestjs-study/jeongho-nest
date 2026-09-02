@@ -8,6 +8,8 @@
   "scripts": {
     "build": "npm run build --workspace=@jeongho-nest/api",
     "start:dev": "npm run start:dev --workspace=@jeongho-nest/api",
-    "lint": "npm run lint --workspace=@jeongho-nest/api"
+    "lint": "npm run lint --workspace=@jeongho-nest/api",
+    "web:dev": "npm run dev --workspace=@jeongho-nest/web",
+    "web:build": "npm run build --workspace=@jeongho-nest/web"
   }
 }

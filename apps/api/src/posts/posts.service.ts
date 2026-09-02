@@ -1,9 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Comment } from '../entities/comment.entity';
+import { Post } from '../entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Post } from '../entities/post.entity';
+
+interface PostCommentCountRow {
+  post_id: number | string;
+  commentCount: number | string;
+}
 
 @Injectable()
 export class PostsService {
@@ -11,6 +17,7 @@ export class PostsService {
     // PostsModule의 forFeature([Post])로 등록한 Repository를 주입합니다.
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
+    private readonly dataSource: DataSource,
   ) {}
 
   create(createPostDto: CreatePostDto): Promise<Post> {
@@ -19,9 +26,22 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
-  findAll(): Promise<Post[]> {
-    return this.postsRepository.find({
-      order: { createdAt: 'DESC' },
+  async findAll(): Promise<Post[]> {
+    const { entities, raw } = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.comments', 'comment', 'comment.deletedAt IS NULL')
+      .addSelect('COUNT(comment.id)', 'commentCount')
+      .groupBy('post.id')
+      .orderBy('post.createdAt', 'DESC')
+      .getRawAndEntities<PostCommentCountRow>();
+    const commentCounts = new Map(
+      raw.map((row) => [Number(row.post_id), Number(row.commentCount)]),
+    );
+
+    return entities.map((post) => {
+      post.commentCount = commentCounts.get(post.id) ?? 0;
+
+      return post;
     });
   }
 
@@ -49,16 +69,32 @@ export class PostsService {
   }
 
   async remove(id: number): Promise<void> {
-    // deletedAt에 삭제 시각을 기록하는 소프트 삭제를 수행합니다.
-    const result = await this.postsRepository.softDelete(id);
+    await this.dataSource.transaction(async (manager) => {
+      const postsRepository = manager.getRepository(Post);
+      const commentsRepository = manager.getRepository(Comment);
+      const post = await postsRepository.findOneBy({ id });
 
-    if (result.affected === 0) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
-    }
+      if (!post) {
+        throw new NotFoundException(`게시글을 찾을 수 없습니다. id: ${id}`);
+      }
+
+      await commentsRepository.softDelete({ post: { id } });
+      await postsRepository.softDelete(id);
+    });
   }
 
   private async findPostById(id: number): Promise<Post> {
-    const post = await this.postsRepository.findOneBy({ id });
+    const post = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect(
+        'post.comments',
+        'comment',
+        'comment.deletedAt IS NULL',
+      )
+      .leftJoinAndSelect('comment.author', 'author')
+      .where('post.id = :id', { id })
+      .orderBy('comment.createdAt', 'ASC')
+      .getOne();
 
     if (!post) {
       // 존재하지 않는 id는 404 오류를 반환합니다.
