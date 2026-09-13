@@ -1,0 +1,6 @@
+@import '@jeongho-nest/tailwind-config';
+@import '../src/styles.css';
+
+body {
+  background: var(--color-surface);
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@jeongho-nest/db",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./data-source": {
+      "types": "./dist/data-source.d.ts",
+      "default": "./dist/data-source.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "migration:generate": "typeorm-ts-node-commonjs -d src/data-source.ts migration:generate migrations/SchemaChange",
+    "migration:run": "typeorm-ts-node-commonjs -d src/data-source.ts migration:run"
+  },
+  "dependencies": {
+    "class-transformer": "^0.5.1",
+    "dotenv": "^16.4.7",
+    "pg": "^8.22.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.31"
+  },
+  "devDependencies": {
+    "@jeongho-nest/tsconfig": "workspace:*",
+    "@types/node": "^24.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

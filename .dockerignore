@@ -1,8 +1,8 @@
 .git
 node_modules
-apps/api/node_modules
+apps/board/api/node_modules
 dist
-apps/api/dist
+apps/board/api/dist
 .env
 .env.*
 coverage

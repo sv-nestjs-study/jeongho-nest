@@ -1,0 +1,4 @@
+# pnpm이 apps와 packages 아래의 package.json을 하나의 워크스페이스로 관리합니다.
+packages:
+  - 'apps/*/*'
+  - 'packages/*'
