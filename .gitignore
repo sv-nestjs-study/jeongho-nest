@@ -5,4 +5,9 @@ dist
 !.env.example
 !.env.*.example
 coverage
+.next
+.turbo
+pnpm-debug.log*
+apps/board/web/dist
+*.tsbuildinfo
 node_modules

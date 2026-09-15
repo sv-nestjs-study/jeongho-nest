@@ -1,0 +1,12 @@
+{
+  "extends": "@jeongho-nest/tsconfig/next.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

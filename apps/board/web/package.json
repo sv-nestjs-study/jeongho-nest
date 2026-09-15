@@ -1,0 +1,30 @@
+{
+  "name": "@jeongho-nest/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start --port 3001",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@jeongho-nest/eslint-config": "workspace:*",
+    "@jeongho-nest/tailwind-config": "workspace:*",
+    "@jeongho-nest/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.18.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  }
+}
