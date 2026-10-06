@@ -4,6 +4,18 @@ import { FormEvent, useEffect, useState } from 'react';
 
 type Tokens = { accessToken: string; refreshToken: string };
 type AuthUser = { sub: number };
+type MyProfile = {
+  id: number;
+  email: string;
+  nickname: string;
+  createdAt: string;
+};
+type MyComment = {
+  id: number;
+  content: string;
+  createdAt: string;
+  post: { id: number; title: string };
+};
 type PostSummary = {
   id: number;
   title: string;
@@ -43,7 +55,10 @@ function App() {
     getStoredToken(refreshTokenStorageKey),
   );
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [myProfile, setMyProfile] = useState<MyProfile | null>(null);
+  const [myComments, setMyComments] = useState<MyComment[]>([]);
   const [authMode, setAuthMode] = useState<AuthMode>(null);
+  const [isMyPage, setIsMyPage] = useState(false);
   const [isWriting, setIsWriting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,6 +86,9 @@ function App() {
     setAccessToken('');
     setRefreshToken('');
     setCurrentUser(null);
+    setMyProfile(null);
+    setMyComments([]);
+    setIsMyPage(false);
     setNotice('로그아웃했습니다.');
   };
 
@@ -140,8 +158,23 @@ function App() {
     }
   };
 
-  const loadCurrentUser = async () => {
+  const loadCurrentUser = async (accessTokenOverride?: string) => {
     try {
+      if (accessTokenOverride) {
+        const response = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${accessTokenOverride}` },
+        });
+        const responseText = await response.text();
+        const body = responseText
+          ? (JSON.parse(responseText) as unknown)
+          : null;
+
+        if (!response.ok) throw new Error(getErrorMessage(body));
+
+        setCurrentUser(body as AuthUser);
+        return;
+      }
+
       setCurrentUser(await requestJson<AuthUser>('/auth/me', {}, true));
     } catch {
       logout();
@@ -154,6 +187,7 @@ function App() {
     try {
       const post = await requestJson<PostDetail>(`/posts/${postId}`);
       setSelectedPost(post);
+      setIsMyPage(false);
       setIsEditing(false);
       setPostForm({
         title: post.title,
@@ -169,10 +203,38 @@ function App() {
 
   const returnToList = () => {
     setSelectedPost(null);
+    setIsMyPage(false);
     setIsWriting(false);
     setIsEditing(false);
     setPostForm(emptyPostForm);
     void loadPosts();
+  };
+
+  const openMyPage = async () => {
+    if (!accessToken && !refreshToken) {
+      setAuthMode('login');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    setSelectedPost(null);
+    setIsWriting(false);
+    setIsEditing(false);
+    setIsMyPage(true);
+
+    try {
+      const [profile, comments] = await Promise.all([
+        requestJson<MyProfile>('/users/me', {}, true),
+        requestJson<MyComment[]>('/users/me/comments', {}, true),
+      ]);
+      setMyProfile(profile);
+      setMyComments(comments);
+    } catch (requestError) {
+      setError(getRequestErrorMessage(requestError));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const submitSignUp = async (event: FormEvent<HTMLFormElement>) => {
@@ -204,7 +266,7 @@ function App() {
       saveTokens(tokens);
       setAuthMode(null);
       setNotice('로그인했습니다. 이제 댓글을 작성할 수 있습니다.');
-      await loadCurrentUser();
+      await loadCurrentUser(tokens.accessToken);
     } catch (requestError) {
       setError(getRequestErrorMessage(requestError));
     }
@@ -318,6 +380,13 @@ function App() {
           <strong>간단한 게시판</strong>
         </button>
         <nav>
+          <button
+            className="text-button"
+            type="button"
+            onClick={() => void openMyPage()}
+          >
+            마이페이지
+          </button>
           {currentUser ? (
             <>
               <span className="user-label">회원 #{currentUser.sub}</span>
@@ -361,7 +430,57 @@ function App() {
         </div>
       )}
 
-      {selectedPost ? (
+      {isMyPage ? (
+        <section className="my-page-section">
+          <button className="back-button" type="button" onClick={returnToList}>
+            ← 목록으로
+          </button>
+          {isLoading ? (
+            <p className="empty-state">마이페이지를 불러오는 중입니다.</p>
+          ) : myProfile ? (
+            <>
+              <section className="profile-card">
+                <p className="eyebrow">my profile</p>
+                <h1>{myProfile.nickname}</h1>
+                <dl>
+                  <div>
+                    <dt>이메일</dt>
+                    <dd>{myProfile.email}</dd>
+                  </div>
+                  <div>
+                    <dt>가입일</dt>
+                    <dd>{formatDate(myProfile.createdAt)}</dd>
+                  </div>
+                </dl>
+              </section>
+              <section className="my-comments-section">
+                <h2>내가 작성한 댓글</h2>
+                <div className="my-comment-list">
+                  {myComments.length === 0 ? (
+                    <p className="empty-state">작성한 댓글이 없습니다.</p>
+                  ) : (
+                    myComments.map((comment) => (
+                      <article className="my-comment-item" key={comment.id}>
+                        <button
+                          className="text-button"
+                          type="button"
+                          onClick={() => void openPost(comment.post.id)}
+                        >
+                          {comment.post.title}
+                        </button>
+                        <p>{comment.content}</p>
+                        <span>{formatDate(comment.createdAt)}</span>
+                      </article>
+                    ))
+                  )}
+                </div>
+              </section>
+            </>
+          ) : (
+            <p className="empty-state">프로필을 불러오지 못했습니다.</p>
+          )}
+        </section>
+      ) : selectedPost ? (
         <section className="post-detail">
           <button className="back-button" type="button" onClick={returnToList}>
             ← 목록으로

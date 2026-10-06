@@ -123,7 +123,8 @@ nav,
 }
 
 .post-list-section,
-.post-detail {
+.post-detail,
+.my-page-section {
   padding-top: 4rem;
 }
 .list-heading {
@@ -186,6 +187,56 @@ p {
 .post-card footer {
   display: flex;
   justify-content: space-between;
+}
+
+.profile-card {
+  border-bottom: 1px solid #deded8;
+  padding-bottom: 2rem;
+}
+.profile-card h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.05em;
+  margin-bottom: 1.5rem;
+}
+.profile-card dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+.profile-card dl div {
+  display: grid;
+  gap: 0.25rem;
+}
+.profile-card dt,
+.my-comment-item span {
+  color: #77736c;
+  font-size: 0.82rem;
+}
+.profile-card dd {
+  margin: 0;
+}
+.my-comments-section {
+  padding-top: 2rem;
+}
+.my-comments-section h2 {
+  font-size: 1.1rem;
+}
+.my-comment-list {
+  border-top: 1px solid #deded8;
+}
+.my-comment-item {
+  border-bottom: 1px solid #deded8;
+  padding: 1rem 0;
+}
+.my-comment-item .text-button {
+  color: #1d1d1b;
+  font-weight: 700;
+  padding-left: 0;
+}
+.my-comment-item p {
+  line-height: 1.6;
+  margin: 0.55rem 0;
+  white-space: pre-wrap;
 }
 
 .back-button {

@@ -26,6 +26,7 @@ async function bootstrap() {
     .addTag('게시글', '게시글 API')
     .addTag('인증', '회원가입, 로그인, JWT 인증 API')
     .addTag('댓글', '댓글 API')
+    .addTag('사용자', '내 프로필과 내 활동 API')
     .addBearerAuth(
       {
         type: 'http',
